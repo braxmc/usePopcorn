@@ -35,7 +35,6 @@ export default function StarRating({
 
   function handleRating(starValue) {
     setRating(starValue);
-    onSetRating(starValue);
   }
 
   const textStyle = {
