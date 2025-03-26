@@ -24,20 +24,6 @@ export default function App() {
   const [error, setError] = useState("");
   const [selectedID, setSelectedId] = useState(null);
 
-  // useEffect(function () {
-  //   console.log("After initial render");
-  // }, []);
-
-  // useEffect(function () {
-  //   console.log("After every render");
-  // });
-
-  // useEffect(function () {
-  //   console.log("After query state is updated");
-  // }, [query]);
-
-  // console.log("During render");
-
   function handleSelectedMovie(id) {
     setSelectedId((selectedID) => (id === selectedID ? null : id));
   }
@@ -127,3 +113,17 @@ export default function App() {
     </>
   );
 }
+
+  // useEffect(function () {
+  //   console.log("After initial render");
+  // }, []);
+
+  // useEffect(function () {
+  //   console.log("After every render");
+  // });
+
+  // useEffect(function () {
+  //   console.log("After query state is updated");
+  // }, [query]);
+
+  // console.log("During render");
