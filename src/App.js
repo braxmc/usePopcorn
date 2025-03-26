@@ -17,7 +17,7 @@ const average = (arr) =>
 const KEY = "410f342d";
 
 export default function App() {
-  const [query, setQuery] = useState("Scooby Doo");
+  const [query, setQuery] = useState("");
   const [movies, setMovies] = useState([]);
   const [watched, setWatched] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -42,12 +42,16 @@ export default function App() {
 
   useEffect(
     function () {
+      const controller = new AbortController();
+      const signal = controller.signal;
+
       async function fetchMovies() {
         try {
           setIsLoading(true);
           setError("");
           const res = await fetch(
-            `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`
+            `https://www.omdbapi.com/?apikey=${KEY}&s=${query}`,
+            { signal }
           );
 
           if (!res.ok)
@@ -57,9 +61,11 @@ export default function App() {
           if (data.Response === "False") throw new Error("Movie not found");
 
           setMovies(data.Search);
-          setIsLoading(false);
+          setError("");
         } catch (err) {
-          setError(err.message);
+          if (error.name !== "AbortError") {
+            setError(err.message);
+          }
         } finally {
           setIsLoading(false);
         }
@@ -71,9 +77,14 @@ export default function App() {
         return;
       }
 
+      handleCloseMovie();
       fetchMovies();
+
+      return function () {
+        controller.abort();
+      };
     },
-    [query]
+    [query, error.name]
   );
 
   return (
@@ -114,16 +125,16 @@ export default function App() {
   );
 }
 
-  // useEffect(function () {
-  //   console.log("After initial render");
-  // }, []);
+// useEffect(function () {
+//   console.log("After initial render");
+// }, []);
 
-  // useEffect(function () {
-  //   console.log("After every render");
-  // });
+// useEffect(function () {
+//   console.log("After every render");
+// });
 
-  // useEffect(function () {
-  //   console.log("After query state is updated");
-  // }, [query]);
+// useEffect(function () {
+//   console.log("After query state is updated");
+// }, [query]);
 
-  // console.log("During render");
+// console.log("During render");

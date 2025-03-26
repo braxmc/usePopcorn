@@ -49,6 +49,23 @@ export default function MovieDetails({
 
   useEffect(
     function () {
+      function callback(e) {
+        if (e.code === "Escape") {
+          onCloseMovie();
+        }
+      }
+
+      document.addEventListener("keydown", callback);
+
+      return function () {
+        document.removeEventListener("keydown", callback);
+      };
+    },
+    [onCloseMovie]
+  );
+
+  useEffect(
+    function () {
       async function getMovieDetails() {
         setIsLoading(true);
         const res = await fetch(
@@ -61,8 +78,7 @@ export default function MovieDetails({
       }
       getMovieDetails();
     },
-    // eslint-disable-next-line
-    [selectedID]
+    [selectedID, KEY]
   );
 
   useEffect(
