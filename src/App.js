@@ -10,6 +10,7 @@ import MovieList from "./components/MovieList.jsx";
 import MovieDetails from "./components/MovieDetails.jsx";
 import WatchedSummary from "./components/WatchedSummary.jsx";
 import WatchedMovieList from "./components/WatchedMovieList.jsx";
+import { useMovies } from "./components/useMovies.jsx";
 
 const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
@@ -18,17 +19,13 @@ const KEY = "410f342d";
 
 export default function App() {
   const [query, setQuery] = useState("");
-  const [movies, setMovies] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
   const [selectedID, setSelectedId] = useState(null);
+  const { movies, isLoading, error } = useMovies(query);
 
   const [watched, setWatched] = useState(function () {
     const storedValue = localStorage.getItem("watched");
-    return JSON.parse(storedValue);
+    return storedValue ? JSON.parse(storedValue) : [];
   });
-
-  useState()
 
   function handleSelectedMovie(id) {
     setSelectedId((selectedID) => (id === selectedID ? null : id));
@@ -51,53 +48,6 @@ export default function App() {
       localStorage.setItem("watched", JSON.stringify(watched));
     },
     [watched]
-  );
-
-  useEffect(
-    function () {
-      const controller = new AbortController();
-      const signal = controller.signal;
-
-      async function fetchMovies() {
-        try {
-          setIsLoading(true);
-          setError("");
-          const res = await fetch(
-            `https://www.omdbapi.com/?apikey=${KEY}&s=${query}`,
-            { signal }
-          );
-
-          if (!res.ok)
-            throw new Error("Something went wrong while fetching movies");
-
-          const data = await res.json();
-          if (data.Response === "False") throw new Error("Movie not found");
-
-          setMovies(data.Search);
-          setError("");
-        } catch (err) {
-          if (error.name !== "AbortError") {
-            setError(err.message);
-          }
-        } finally {
-          setIsLoading(false);
-        }
-      }
-
-      if (query.length < 3) {
-        setMovies([]);
-        setError("");
-        return;
-      }
-
-      handleCloseMovie();
-      fetchMovies();
-
-      return function () {
-        controller.abort();
-      };
-    },
-    [query, error.name]
   );
 
   return (
@@ -137,17 +87,3 @@ export default function App() {
     </>
   );
 }
-
-// useEffect(function () {
-//   console.log("After initial render");
-// }, []);
-
-// useEffect(function () {
-//   console.log("After every render");
-// });
-
-// useEffect(function () {
-//   console.log("After query state is updated");
-// }, [query]);
-
-// console.log("During render");
